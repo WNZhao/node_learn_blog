@@ -4,11 +4,11 @@
 
 var express = require('express');
 var routes = require('./routes');
-//var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
 var MongoStore = require('connect-mongo')(express);
 var settings = require("./settings");
+var flash = require('connect-flash');
 var app = express();
 
 // all environments
@@ -16,6 +16,7 @@ var app = express();
 app.set('port', process.env.PORT || 80);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.use(flash());
 app.use(express.favicon(__dirname+'/public/images/favicon.ico'));
 app.use(express.logger('dev'));
 app.use(express.json());
