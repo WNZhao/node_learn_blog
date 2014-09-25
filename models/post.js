@@ -67,7 +67,8 @@ Post.get = function(name,callback){
                  return callback(err);
                }
               docs.forEach(function(doc){
-                 doc.post = markdown.toHTML(doc.post);
+                //console.log(doc);
+                // doc.post = markdown.toHTML(doc.post);
                });
               console.log(docs.length);
                callback(null,docs);
