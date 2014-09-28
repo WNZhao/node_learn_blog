@@ -1,4 +1,4 @@
-var mongodb = require('./db');//,markdown = require('markdown').markdown;
+var mongodb = require('./db'),markdown = require('markdown').markdown;
 function Post(name,title,post){
   this.name = name;
   this.title = title;
@@ -13,7 +13,7 @@ Post.prototype.save = function(callback){
       year:date.getFullYear(),
       month:date.getFullYear()+"-"+(date.getMonth()+1),
       day:date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate(),
-      minute:date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+(date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes()),
+      minute:date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+(date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes())
   };
   var post = {
         name:this.name,
@@ -45,7 +45,7 @@ Post.prototype.save = function(callback){
 }
 
 //Read article infos
-Post.get = function(name,callback){
+Post.getAll = function(name,callback){
    mongodb.open(function(err,db){
       if(err){
          return callback(err);
@@ -67,13 +67,64 @@ Post.get = function(name,callback){
                  return callback(err);
                }
               docs.forEach(function(doc){
-                //console.log(doc);
-                // doc.post = markdown.toHTML(doc.post);
+                 doc.post = markdown.toHTML(doc.post);
+                 console.log(doc.post);
                });
-              console.log(docs.length);
+              //console.log(docs.length);
                callback(null,docs);
            });
       });
   });
+}
+  //get one article
+Post.getOne = function(name,day,title,callback){
+     mongodb.open(function(err,db){
+       if(err){
+         return callback(err);
+       } 
+       db.collection('posts',function(err,collection){
+          if(err){
+            mongodb.close();
+            return callback(err);
+          }
+          collection.findOne({
+                               "name":name,
+                               "time.day":day,
+                               "title":title
+                             }
+                             ,function(err,doc){
+                               mongodb.close();
+                               if(err){
+                                  return callback(err);
+                               }
+                               doc.post = markdown.toHTML(doc.post);
+                               callback(null,doc);
+                             });
+       });
+    });
+  }
 
+Post.edit = function(name,day,title,callback){
+    mongodb.open(function(err,db){
+        if(err){
+            return callback(err);
+        }
+        db.collection('posts',function(err,collection){
+            if(err){
+                mongodb.close();
+                return callback(err);
+            }
+            collection.findOne({
+                "name":name,
+                "time.day":day,
+                "title":title
+            },function(err,doc){
+                mongodb.close();
+                if(err){
+                    return callback(err);
+                }
+                callback(null,doc);
+            });
+        });
+    });
 }

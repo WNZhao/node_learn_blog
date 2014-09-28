@@ -36,6 +36,7 @@ app.use(express.session({
 
 }));
 
+app.use(express.bodyParser({keepExtensions:true,uploadDir:'./public/images'}));
 
 
 app.use(app.router);
