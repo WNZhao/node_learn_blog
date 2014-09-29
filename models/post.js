@@ -68,9 +68,7 @@ Post.getAll = function(name,callback){
                }
               docs.forEach(function(doc){
                  doc.post = markdown.toHTML(doc.post);
-                 console.log(doc.post);
                });
-              //console.log(docs.length);
                callback(null,docs);
            });
       });
@@ -126,5 +124,56 @@ Post.edit = function(name,day,title,callback){
                 callback(null,doc);
             });
         });
+    });
+}
+
+Post.update = function(name,day,title,post,callback){
+    mongodb.open(function(err,db){
+        if(err){
+            return callback(err);
+        }
+        db.collection('posts',function(err,collection){
+           if(err){
+               mongodb.close();
+               return callback(err);
+           }
+           console.log(post);
+            collection.update({
+                "name":name,
+                "time.day":day,
+                "title":title
+            },{$set:{post:post}},function(err){
+                mongodb.close();
+                if(err){
+                    return callback(err);
+                }
+                callback(null);
+            });
+        });
+    });
+}
+
+Post.remove = function(name,day,title,callback){
+    mongodb.open(function(err,db){
+       if(err){
+           return callback(err);
+       }
+       db.collection('posts',function(err,collection){
+           if(err){
+               mongodb.close();
+               return callback(err);
+           }
+           collection.remove({
+               "name":name,
+               "time.day":day,
+               "title":title
+           },{w:1},function(err){
+               mongodb.close();
+               if(err){
+                   callback(err);
+               }
+               callback(null);
+           });
+       });
     });
 }
